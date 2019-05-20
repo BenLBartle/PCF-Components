@@ -34,9 +34,9 @@ This should bootstrap the component and run the harness to allow you to see the 
 
 ## SpeechToText
 
-![alt text](https://github.com/BenLBartle/PCF-Components/blob/master/SpeechToText.png?raw=true "Speech To Text Screenshot")
+![alt text](https://raw.githubusercontent.com/BenLBartle/PCF-Components/master/SpeechToText.png "Speech To Text Screenshot")
 
-This is a component that uses the Web Speech API to allow real-time text recognition to a CDS text field. This control supports the following CDS Field types:
+This is a component that uses the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API) to allow real-time text recognition to a CDS text field. This control supports the following CDS Field types:
 
 - SingleLine.Text
 - SingleLine.TextArea
@@ -45,6 +45,8 @@ This is a component that uses the Web Speech API to allow real-time text recogni
 It has no parameters.
 
 > **Note**: Due to the delay of the Web Speech API being implemented in browsers, only Chrome supports this control OOTB. I believe Firefox can be configured to turn this on, but YMMV.
+
+> ***More Important Note***: Currently Chrome will submit your audio for regognition to a server side API. This is abstracted from you and I have no idea where it is or whether it could change without notice. This also means it won't work offline.
 
 ### Usage
 Once you've added this control to your field, it will appear as a standard multi-line text field but with the addition of a button above the `textarea`. If you click this button you will be prompted for permission to use your microphone, and once you've clicked 'Allow' it will start automatically recording what you say. After a period of time it will stop listening and the button will change back to its original state.
