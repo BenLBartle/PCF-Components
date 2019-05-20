@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="Bartl.Pcf" constructor="SpeechToText" version="0.0.1" display-name-key="Speech To Text" description-key="Speech to Text Control using the Web Speech API" control-type="standard">
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="textProperty" display-name-key="Recognised Text" description-key="Recognised Text" of-type-group="TextInputs" usage="bound" required="true" />
+      <type-group name="TextInputs">
+        <type>SingleLine.Text</type>
+        <type>SingleLine.TextArea</type>
+        <type>Multiple</type>
+      </type-group>
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="css/SpeechToText.css" order="1" />
+      <!-- UNCOMMENT TO ADD MORE RESOURCES
+      <resx path="strings/SpeechToText.1033.resx" version="1.0.0" />
+      -->
+    </resources>
+  </control>
+</manifest>
