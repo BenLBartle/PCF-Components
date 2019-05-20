@@ -26,6 +26,8 @@ export class SpeechToText implements ComponentFramework.StandardControl<IInputs,
 	// Define SpeechRegonition Service
 	private _speechRecognition: SpeechRecognition;
 
+	private _refreshData: EventListenerOrEventListenerObject;
+
 	/**
 	 * Empty constructor.
 	 */
@@ -47,7 +49,10 @@ export class SpeechToText implements ComponentFramework.StandardControl<IInputs,
 		this._context = context;
 		this._container = document.createElement("div");
 		this._notifyOutputChanged = notifyOutputChanged;
+		this._refreshData = this.RefreshData.bind(this);
 
+		// Initialise Value
+		
 		// Layout Elements
 		var divStart = document.createElement("div");
 		divStart.setAttribute("class", "record-div");
@@ -58,6 +63,8 @@ export class SpeechToText implements ComponentFramework.StandardControl<IInputs,
 		// Input Elements
 		this._inputText = document.createElement("textarea");
 		this._inputText.setAttribute("class", "input-text");
+		this._inputText.value = this._value;
+		this._inputText.addEventListener("input", this._refreshData);
 		this._speakNowButton = document.createElement("button");
 		this._speakNowButton.setAttribute("type", "button");
 		this._speakNowButton.setAttribute("class", "record-button");
@@ -94,10 +101,10 @@ export class SpeechToText implements ComponentFramework.StandardControl<IInputs,
 			}
 			finalTranscript = finalTranscript.replace(two_line_regex, '<p></p>').replace(one_line_regex, '<br>');;
 			this._inputText.value = finalTranscript.replace(first_char_regex, m => { return m.toUpperCase(); });
-			this.RefreshData();
 		};
 
 		this._speechRecognition.onend = () => {
+			this.RefreshData();
 			this.EnableSpeakNowButton();
 		};
 
@@ -138,7 +145,12 @@ export class SpeechToText implements ComponentFramework.StandardControl<IInputs,
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void {
 		// Add code to update control view
-		this._context = context;
+
+		if(context.parameters.textProperty != null){
+			this._value = context.parameters.textProperty.raw;
+		}
+
+		this._inputText.value = this._value;
 	}
 
 	/** 

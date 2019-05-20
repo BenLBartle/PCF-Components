@@ -1,6 +1,6 @@
 # PCF-Components
 
-Here is a collection of components I have created using the [PowerApps Component Framework](https://docs.microsoft.com/en-us/powerapps/developer/component-framework/overview). These are just examples of what can be done usig the currently available tools.
+Here is a collection of components I have created using the [PowerApps Component Framework](https://docs.microsoft.com/en-us/powerapps/developer/component-framework/overview). These are just examples of what can be done usig the currently available tools. Big thanks to Andrew Ly ([@365lyf](https://twitter.com/365lyf)) for the sample code.
 
 ## Pre-requisites 
 
