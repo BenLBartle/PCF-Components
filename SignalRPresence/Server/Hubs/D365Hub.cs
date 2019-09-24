@@ -7,9 +7,9 @@ namespace SignalRChat.Hubs
     public class D365Hub : Hub
     {
 
-        private IList<string> _connectedUsers, _editingUsers = new List<string>();
+        private static IList<string> _connectedUsers, _editingUsers;
 
-        public D365Hub() {
+        static D365Hub() {
             _connectedUsers = new List<string>();
         }
 

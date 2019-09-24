@@ -11,9 +11,13 @@
   "dependencies": {
     "@aspnet/signalr": "^1.1.4",
     "@types/node": "^10.12.18",
-    "@types/powerapps-component-framework": "^1.2.0"
+    "@types/powerapps-component-framework": "^1.2.0",
+    "office-ui-fabric-react": "^7.37.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
   },
   "devDependencies": {
+    "@types/react": "^16.9.2",
     "pcf-scripts": "^0",
     "pcf-start": "^0"
   }
