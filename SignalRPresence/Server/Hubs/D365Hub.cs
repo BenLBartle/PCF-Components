@@ -7,10 +7,11 @@ namespace SignalRChat.Hubs
     public class D365Hub : Hub
     {
 
-        private static IList<string> _connectedUsers, _editingUsers;
+        private static IDictionary<string, IList<string>> _connectedUsers
 
-        static D365Hub() {
-            _connectedUsers = new List<string>();
+        static D365Hub()
+        {
+            _connectedUsers = new Dictionary<string, IList<string>>();
         }
 
         public async Task SendMessage(string user, string message)
@@ -20,6 +21,7 @@ namespace SignalRChat.Hubs
 
         public async Task ConnectToRecord(string user, string recordId)
         {
+
             _connectedUsers.Add(user);
             await Clients.Caller.SendAsync("ConnectionEstablished", _connectedUsers);
             await Clients.All.SendAsync("UserConnected", user);
@@ -27,19 +29,31 @@ namespace SignalRChat.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            foreach(var user in _connectedUsers) {
+            Microsoft.Extensions.Primitives.StringValues groupName = Context.GetHttpContext().Request.Query["RecordId"];
+            Microsoft.Extensions.Primitives.StringValues userId = Context.GetHttpContext().Request.Query["UserId"];
+
+            if (!_connectedUsers.ContainsKey(groupName))
+            {
+                _connectedUsers.Add(groupName, new List<string>());
+            }
+            foreach (var user in _connectedUsers[groupName])
+            {
                 await Clients.Client(Context.ConnectionId).SendAsync("UserConnected", user);
             }
-            _connectedUsers.Add(Context.GetHttpContext().Request.Query["UserId"]);
+            if (!_connectedUsers[groupName].Contains(userId))
+            {
+                _connectedUsers[groupName].Add(Context.GetHttpContext().Request.Query["UserId"]);
+            }
             await Groups.AddToGroupAsync(Context.ConnectionId, Context.GetHttpContext().Request.Query["RecordId"]);
-            await Clients.GroupExcept(Context.GetHttpContext().Request.Query["RecordId"], Context.ConnectionId).SendAsync("UserConnected", Context.GetHttpContext().Request.Query["UserId"]);
+
+            await Clients.GroupExcept(groupName, Context.ConnectionId).SendAsync("UserConnected", Context.GetHttpContext().Request.Query["UserId"][0]);
         }
 
         public override async Task OnDisconnectedAsync(System.Exception exception)
         {
-            _connectedUsers.Remove(Context.GetHttpContext().Request.Query["UserId"]);
+            _connectedUsers[Context.GetHttpContext().Request.Query["RecordId"]].Remove(Context.GetHttpContext().Request.Query["UserId"]);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.GetHttpContext().Request.Query["RecordId"]);
-            await Clients.Group(Context.GetHttpContext().Request.Query["RecordId"]).SendAsync("UserDisconnected", Context.GetHttpContext().Request.Query["UserId"]);
+            await Clients.Group(Context.GetHttpContext().Request.Query["RecordId"]).SendAsync("UserDisconnected", Context.GetHttpContext().Request.Query["UserId"][0]);
         }
     }
 }

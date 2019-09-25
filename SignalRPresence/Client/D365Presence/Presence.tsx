@@ -9,6 +9,13 @@ export interface IFacepileState {
     personas: IFacepilePersona[]
 }
 
+export interface IXrmFacepileProps extends IFacepileProps {
+    webApi: ComponentFramework.WebApi,
+    signalRUrl: string,
+    userId: string,
+    recordId: string
+}
+
 const tokens = {
     sectionStack: {
         childrenGap: 10
@@ -18,28 +25,31 @@ const tokens = {
     }
 };
 
-export class D365Facepile extends React.Component<IFacepileProps, IFacepileState> {
-    constructor(props: IFacepileProps) {
+export class D365Facepile extends React.Component<IXrmFacepileProps, IFacepileState> {
+    constructor(props: IXrmFacepileProps) {
         super(props);
 
         this.state = {
             personas: []
         };
 
-        var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:5080/d365Hub/?UserId=Ben" + this.makeid(5) + "&RecordId=1").build();
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${this.props.signalRUrl}?UserId=${this.props.userId}&RecordId=${this.props.recordId}`)
+            .build();
 
-        //Disable send button until connection is established
-
-        connection.on("UserConnected", user => {
-            this.setState({
-                personas: this.state.personas.concat(this.createPersona(user))
-            });
+        connection.on("UserConnected", userid => {
+            this.createPersona(userid)
+                .then(persona => {
+                    this.setState({
+                        personas: this.state.personas.concat(persona)
+                    });
+                })
         });
 
-        connection.on("UserDisconnected", user => {
+        connection.on("UserDisconnected", userid => {
             this.setState({
                 personas: this.state.personas.filter(p => {
-                    return p.personaName != user[0]
+                    return p.id != userid
                 })
             })
         });
@@ -47,25 +57,29 @@ export class D365Facepile extends React.Component<IFacepileProps, IFacepileState
         connection.start();
     }
 
-    private createPersona(user: any): IFacepilePersona | ConcatArray<IFacepilePersona> {
+    private async createPersona(userid: string): Promise<IFacepilePersona> {
+
+        const systemUser = await this.props.webApi.retrieveRecord('systemuser', userid);
+
         return {
-            imageUrl: 'https://org3a182f51.crm11.dynamics.com/Image/download.aspx?Entity=systemuser&Attribute=entityimage&Id=f78e4117-a746-49a1-a249-30b6e4636987&Timestamp=637049256921404120',
-            imageInitials: 'BB',
-            personaName: user,
+            id: userid,
+            imageUrl: systemUser.entityimage_url,
+            imageInitials: this.getInitials(systemUser.fullname),
+            personaName: systemUser.fullname,
             initialsColor: PersonaInitialsColor.green,
             data: '25%'
         };
     }
 
-    private makeid(length: number) {
-        var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    private getInitials(name: string) {
+        var names = name.split(' '),
+            initials = names[0].substring(0, 1).toUpperCase();
+
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
         }
-        return result;
-    }
+        return initials;
+    };
 
     public render(): JSX.Element {
         const facepileProps: IFacepileProps = {
@@ -79,13 +93,6 @@ export class D365Facepile extends React.Component<IFacepileProps, IFacepileState
             ariaDescription: 'To move through the items use left and right arrow keys.'
         };
 
-        return (
-            <Stack tokens={tokens.headingStack}>
-                <Text variant={'small'} block>
-                    Connected Users
-              </Text>
-                <Facepile {...facepileProps} />
-            </Stack>
-            );
+        return <Facepile {...facepileProps} />;
     }
 }

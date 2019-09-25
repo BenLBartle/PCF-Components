@@ -83,7 +83,11 @@ export class D365Presence implements ComponentFramework.StandardControl<IInputs,
 		  React.createElement(
 			D365Facepile, // the class type of the React component found in Facepile.tsx
 			{
-				personas: []
+				personas: [],
+				webApi: context.webAPI,
+				signalRUrl: context.parameters.signalRUrl.raw || '',
+				userId: context.userSettings.userId,
+				recordId: (<any>context).page.entityId
 			}
 		  ),
 		  this.theContainer
