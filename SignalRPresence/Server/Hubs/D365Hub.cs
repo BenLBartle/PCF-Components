@@ -7,24 +7,11 @@ namespace SignalRChat.Hubs
     public class D365Hub : Hub
     {
 
-        private static IDictionary<string, IList<string>> _connectedUsers
+        private static IDictionary<string, IList<string>> _connectedUsers;
 
         static D365Hub()
         {
             _connectedUsers = new Dictionary<string, IList<string>>();
-        }
-
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
-        }
-
-        public async Task ConnectToRecord(string user, string recordId)
-        {
-
-            _connectedUsers.Add(user);
-            await Clients.Caller.SendAsync("ConnectionEstablished", _connectedUsers);
-            await Clients.All.SendAsync("UserConnected", user);
         }
 
         public override async Task OnConnectedAsync()

@@ -38,20 +38,24 @@ export class D365Facepile extends React.Component<IXrmFacepileProps, IFacepileSt
             .build();
 
         connection.on("UserConnected", userid => {
-            this.createPersona(userid)
-                .then(persona => {
-                    this.setState({
-                        personas: this.state.personas.concat(persona)
-                    });
-                })
+            if (userid != this.props.userId && !this.state.personas.some(p => p.id == userid)) {
+                this.createPersona(userid)
+                    .then(persona => {
+                        this.setState({
+                            personas: this.state.personas.concat(persona)
+                        });
+                    })
+            }
         });
 
         connection.on("UserDisconnected", userid => {
-            this.setState({
-                personas: this.state.personas.filter(p => {
-                    return p.id != userid
+            if (userid != this.props.userId) {
+                this.setState({
+                    personas: this.state.personas.filter(p => {
+                        return p.id != userid
+                    })
                 })
-            })
+            }
         });
 
         connection.start();
