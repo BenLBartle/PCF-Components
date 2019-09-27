@@ -50,3 +50,24 @@ It has no parameters.
 
 ### Usage
 Once you've added this control to your field, it will appear as a standard multi-line text field but with the addition of a button above the `textarea`. If you click this button you will be prompted for permission to use your microphone, and once you've clicked 'Allow' it will start automatically recording what you say. After a period of time it will stop listening and the button will change back to its original state.
+
+## D365 Presence
+
+This is a control that uses a ASP.NET Core SignalR service to provide real-time communication to allow the presence of other users on records you're viewing to be shown using an [Office UI Fabric Facepile](https://developer.microsoft.com/en-us/fabric#/controls/web/facepile).
+
+This contains two folders, `Client`; which contains the PCF control and `Server` which contains a very *very* basic example of a SignalR service that could be used. This is very very beta and is basically there to act as a starter for ten as to how people would want to use it. It doesn't cover things such as secure authentication, as everyones requirements may be different.
+
+The SignalR service is a single `Hub` class which acts on connections and disconnections only and routes notifications out to the clients. At the moment it is persisting the current state of connected clients to a record as a static property of the class, this is obviously not optimal but is just there to illustrate the principle. Luckily this hub doesn't need to persist anything other than guids, so no personal data is stored outside of CDS.
+
+The control is currently bound to a single line of text field, but obviously this could be anything, and has a single parameter to take the SignalR Hub Url. From my experience the best place to include this is in the header.
+
+The maximum number of personas in the facepile can be configured, as well as the background colour of the initials icon (if the user has no photo).
+
+Currently the control will **not** show the current user in the connected users control, this behaviour can obviously be changed if required.
+
+### Todo
+
+- Investigate how to secure communication between client and server using Azure Functions.
+- Come up with some ideas of how to better handle the situation where one user connects to the same record multiple times (although this is likely a very edge case)
+- Investigate whether an event can be bound to the IsDirty property (do we get this in the PCF context?) to see if we can see who is actively editing and not just viewing
+- Better packaging, tests, documentation

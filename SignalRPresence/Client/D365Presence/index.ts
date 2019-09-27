@@ -1,5 +1,8 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as signalR from "@aspnet/signalr";
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { D365Facepile } from './Presence'
 
 export class D365Presence implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -8,6 +11,15 @@ export class D365Presence implements ComponentFramework.StandardControl<IInputs,
 	private _container: HTMLDivElement;
 
 	private _messagesList: HTMLUListElement;
+
+	private notifyOutputChanged: () => void;
+	// Reference to the container div
+	private theContainer: HTMLDivElement;
+	// Reference to the React props, prepopulated with a bound event handler
+	/**
+* Called by the React component when it detects a change in the number of faces shown
+* @param newValue The newly detected number of faces
+*/
 
 	/**
 	 * Empty constructor.
@@ -26,12 +38,15 @@ export class D365Presence implements ComponentFramework.StandardControl<IInputs,
 	 */
 	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container: HTMLDivElement) {
 		// Add control initialization code
-		this._container = document.createElement("div");
-		this._messagesList = document.createElement("ul");
-		this._messagesList.id = "messagesList";
-		this._container.append(this._messagesList);
+		// this._container = document.createElement("div");
+		// this._messagesList = document.createElement("ul");
+		// this._messagesList.id = "messagesList";
+		// this._container.append(this._messagesList);
 
-		container.append(this._container);
+		// container.append(this._container);
+
+		this.notifyOutputChanged = notifyOutputChanged;
+		this.theContainer = container;
 	}
 
 
@@ -41,25 +56,43 @@ export class D365Presence implements ComponentFramework.StandardControl<IInputs,
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void {
 		// Add code to update control view
-		var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:5080/d365Hub/?UserId=Ben" + this.makeid(5) + "&RecordId=1").build();
+		// var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:5080/d365Hub/?UserId=Ben" + this.makeid(5) + "&RecordId=1").build();
 
-		//Disable send button until connection is established
+		// //Disable send button until connection is established
 
-		connection.on("UserConnected", user => {
-			var encodedMsg = user + " connected";
-			var li = document.createElement("li");
-			li.textContent = encodedMsg;
-			this._messagesList.appendChild(li);
-		});
+		// connection.on("UserConnected", user => {
+		// 	var encodedMsg = user + " connected";
+		// 	var li = document.createElement("li");
+		// 	li.textContent = encodedMsg;
+		// 	this._messagesList.appendChild(li);
+		// });
 
-		connection.on("UserDisconnected", user => {
-			var encodedMsg = user + " disconnected";
-			var li = document.createElement("li");
-			li.textContent = encodedMsg;
-			this._messagesList.appendChild(li);
-		});
+		// connection.on("UserDisconnected", user => {
+		// 	var encodedMsg = user + " disconnected";
+		// 	var li = document.createElement("li");
+		// 	li.textContent = encodedMsg;
+		// 	this._messagesList.appendChild(li);
+		// });
 
-		connection.start();
+		// connection.start();
+		//if (context.updatedProperties.includes("numberOfFaces")) this.props.numberOfFaces = context.parameters.numberOfFaces.raw || 3;
+
+		// Render the React component into the div container
+		ReactDOM.render(
+		  // Create the React component
+		  React.createElement(
+			D365Facepile, // the class type of the React component found in Facepile.tsx
+			{
+				personas: [],
+				webApi: context.webAPI,
+				signalRUrl: context.parameters.signalRUrl.raw || '',
+				userId: context.userSettings.userId,
+				recordId: (<any>context).page.entityId
+			}
+		  ),
+		  this.theContainer
+		);
+
 	}
 
 	/** 
@@ -78,14 +111,6 @@ export class D365Presence implements ComponentFramework.StandardControl<IInputs,
 		// Add code to cleanup control if necessary
 	}
 
-	private makeid(length: number) {
-		var result = '';
-		var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		var charactersLength = characters.length;
-		for (var i = 0; i < length; i++) {
-			result += characters.charAt(Math.floor(Math.random() * charactersLength));
-		}
-		return result;
-	}
+	
 
 }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="Bartl.Pcf" constructor="D365Presence" version="0.0.1" display-name-key="D365Presence" description-key="D365Presence description" control-type="standard">
+  <control namespace="Bartl.Pcf" constructor="D365Presence" version="1.0.0" display-name-key="D365Presence" description-key="D365Presence description" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
-    <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="Sample" display-name-key="Sample" description-key="Sample" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="signalRUrl" display-name-key="SignalR Url" description-key="SignalR Url" of-type="SingleLine.Text" usage="input" required="true" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:
@@ -21,17 +22,16 @@
       <resx path="strings/D365Presence.1033.resx" version="1.0.0" />
       -->
     </resources>
-    <!-- UNCOMMENT TO ENABLE THE SPECIFIED API
+    
     <feature-usage>
-      <uses-feature name="Device.captureAudio" required="true" />
+      <!-- <uses-feature name="Device.captureAudio" required="true" />
       <uses-feature name="Device.captureImage" required="true" />
       <uses-feature name="Device.captureVideo" required="true" />
       <uses-feature name="Device.getBarcodeValue" required="true" />
       <uses-feature name="Device.getCurrentPosition" required="true" />
       <uses-feature name="Device.pickFile" required="true" />
-      <uses-feature name="Utility" required="true" />
+      <uses-feature name="Utility" required="true" /> -->
       <uses-feature name="WebAPI" required="true" />
     </feature-usage>
-    -->
   </control>
 </manifest>
